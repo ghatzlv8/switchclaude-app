@@ -6,27 +6,44 @@ export default function Page(){
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
-      <style>{`*{font-feature-settings:"ss01"} body{font-family:'Source Sans 3',system-ui,sans-serif}`}</style>
+      <style>{`* { font-feature-settings: "ss01"; }
+        body { font-family: 'Source Sans 3', system-ui, sans-serif; margin: 0; }
+        .hero-grid { max-width: 1080px; margin: 0 auto; padding: 64px 24px 40px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: center; }
+        .hero-h1 { margin-top: 16px; font-size: clamp(36px, 8vw, 56px); font-weight: 300; line-height: 1.05; letter-spacing: -0.04em; color: #061b31; }
+        .sec-h2 { font-size: clamp(24px, 5.5vw, 32px); font-weight: 300; letter-spacing: -0.02em; }
+        .cards-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .cta-row { margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .cta-row a { flex: 1 1 auto; text-align: center; white-space: nowrap; }
+        .dl-row { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .dl-row a { flex: 1 1 200px; text-align: center; }
+        @media (max-width: 860px) {
+          .hero-grid { grid-template-columns: 1fr; padding: 40px 20px 28px; gap: 24px; }
+          .cards-grid { grid-template-columns: 1fr; }
+          section[id] { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+        @media (max-width: 640px) {
+          .nav-links a.nav-hide-mobile { display: none; }
+        }`}</style>
       <div style={{background:"#fff", color:"#061b31"}}>
         {/* NAV */}
         <header style={{position:"sticky", top:0, backdropFilter:"blur(12px)", background:"rgba(255,255,255,0.8)", borderBottom:"1px solid #e5edf5", zIndex:10}}>
           <div style={{maxWidth:1080, margin:"0 auto", padding:"16px 24px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
             <div style={{display:"flex", alignItems:"center", gap:10, fontWeight:600, letterSpacing:"-0.3px"}}><span style={{width:28, height:28, borderRadius:8, background:"#533afd", color:"#fff", display:"grid", placeItems:"center", fontSize:14}}>⇄</span> SwitchClaude</div>
-            <div style={{display:"flex", gap:20, alignItems:"center", fontSize:14}}>
-              <a href="#how" style={{color:"#061b31", textDecoration:"none"}}>How it works</a>
-              <a href="#pricing" style={{color:"#061b31", textDecoration:"none"}}>Pricing</a>
+            <div className="nav-links" style={{display:"flex", gap:20, alignItems:"center", fontSize:14}}>
+              <a href="#how" className="nav-hide-mobile" style={{color:"#061b31", textDecoration:"none"}}>How it works</a>
+              <a href="#pricing" className="nav-hide-mobile" style={{color:"#061b31", textDecoration:"none"}}>Pricing</a>
               <a href="#download" style={{background:"#533afd", color:"#fff", padding:"8px 16px", borderRadius:4, textDecoration:"none", fontWeight:500}}>Download</a>
             </div>
           </div>
         </header>
 
         {/* HERO */}
-        <section style={{maxWidth:1080, margin:"0 auto", padding:"64px 24px 40px", display:"grid", gridTemplateColumns:"1.1fr 0.9fr", gap:32, alignItems:"center"}}>
+        <section className="hero-grid">
           <div>
-            <div style={{display:"inline-flex", alignItems:"center", gap:8, fontSize:12, padding:"4px 10px", borderRadius:20, border:"1px solid #e5edf5", background:"#f6f9fc"}}><span style={{width:6, height:6, borderRadius:999, background:"#15be53"}}/> Works with Google login • macOS • Windows • Linux</div>
-            <h1 style={{marginTop:16, fontSize:56, fontWeight:300, lineHeight:1.03, letterSpacing:"-1.4px", color:"#061b31", fontFeatureSettings:'"ss01"'}}>Switch Claude<br/>accounts in<br/>2 seconds.</h1>
+            <div style={{display:"inline-flex", alignItems:"center", gap:8, fontSize:12, padding:"4px 10px", borderRadius:20, border:"1px solid #e5edf5", background:"#f6f9fc", maxWidth:"100%"}}><span style={{width:6, height:6, borderRadius:999, background:"#15be53", flexShrink:0}}/> Works with Google login • macOS • Windows • Linux</div>
+            <h1 className="hero-h1">Switch Claude<br/>accounts in<br/>2 seconds.</h1>
             <p style={{marginTop:16, fontSize:18, fontWeight:300, lineHeight:1.4, color:"#64748d"}}>The WiFi switch for Claude Desktop. Isolated profiles — chats never lost, Google OAuth supported.</p>
-            <div style={{marginTop:24, display:"flex", gap:12}}>
+            <div className="cta-row">
               <a href="#pricing" style={{background:"#533afd", color:"#fff", padding:"10px 18px", borderRadius:4, textDecoration:"none", fontWeight:500, boxShadow:"rgba(50,50,93,0.25) 0px 13px 27px -5px, rgba(0,0,0,0.1) 0px 8px 16px -8px"}}>Get SwitchClaude — $9.99</a>
               <a href="#how" style={{border:"1px solid #b9b9f9", color:"#533afd", padding:"10px 18px", borderRadius:4, textDecoration:"none", fontWeight:500}}>See how it works</a>
             </div>
@@ -44,8 +61,8 @@ export default function Page(){
 
         {/* HOW */}
         <section id="how" style={{maxWidth:1080, margin:"0 auto", padding:"40px 24px", borderTop:"1px solid #e5edf5"}}>
-          <h2 style={{fontSize:32, fontWeight:300, letterSpacing:"-0.64px"}}>How it works</h2>
-          <div style={{marginTop:24, display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
+          <h2 className="sec-h2">How it works</h2>
+          <div className="cards-grid">
             {[
               ["01 — Add account","Click + → Claude opens empty → you log in once (Email or Google). We save an isolated profile — chats never lost."],
               ["02 — Switch in 2 sec","Click Switch → Claude restarts with the other profile. No chat loss, ever."],
@@ -61,9 +78,9 @@ export default function Page(){
 
         {/* PRICING */}
         <section id="pricing" style={{maxWidth:1080, margin:"0 auto", padding:"40px 24px", borderTop:"1px solid #e5edf5"}}>
-          <h2 style={{fontSize:32, fontWeight:300, letterSpacing:"-0.64px"}}>Pricing — one-time</h2>
+          <h2 className="sec-h2">Pricing — one-time</h2>
           <p style={{color:"#64748d", fontSize:14}}>Pay once per extra account you want to add. First account is free (trial).</p>
-          <div style={{marginTop:24, display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
+          <div className="cards-grid">
             <div style={{border:"1px solid #e5edf5", borderRadius:6, padding:24}}>
               <div style={{fontWeight:600}}>Starter</div><div style={{fontSize:32, fontWeight:300, marginTop:8}}>$0</div><div style={{fontSize:13, color:"#64748d"}}>1 account • 7-day trial</div>
               <a href="#download" style={{display:"block", marginTop:16, textAlign:"center", padding:"10px 0", borderRadius:4, border:"1px solid #e5edf5", textDecoration:"none", color:"#061b31", fontWeight:500}}>Download free</a>
@@ -82,8 +99,8 @@ export default function Page(){
 
         {/* DOWNLOAD */}
         <section id="download" style={{maxWidth:1080, margin:"0 auto", padding:"40px 24px", borderTop:"1px solid #e5edf5"}}>
-          <h2 style={{fontSize:26, fontWeight:300}}>Download — macOS • Windows • Linux</h2>
-          <div style={{marginTop:16, display:"flex", gap:12, flexWrap:"wrap"}}>
+          <h2 className="sec-h2">Download — macOS • Windows • Linux</h2>
+          <div className="dl-row">
             <a href="/api/download?platform=mac" style={{background:"#533afd", color:"#fff", padding:"10px 18px", borderRadius:4, textDecoration:"none", fontWeight:500}}>Download for macOS (.dmg)</a>
             <a href="/api/download?platform=win" style={{background:"#061b31", color:"#fff", padding:"10px 18px", borderRadius:4, textDecoration:"none", fontWeight:500}}>Download for Windows (.exe)</a>
             <a href="/api/download?platform=linux" style={{border:"1px solid #b9b9f9", color:"#533afd", padding:"10px 18px", borderRadius:4, textDecoration:"none", fontWeight:500}}>Download for Linux (.AppImage)</a>
