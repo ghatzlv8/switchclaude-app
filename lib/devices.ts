@@ -25,7 +25,18 @@ export async function checkDevice(key: string, deviceId: string, max: number): P
   if (devices.includes(deviceId)) return { ok: true, devices: devices.length };
   if (devices.length >= limit) return { ok: false, reason: "device_limit", devices: devices.length };
   const next: Binding = { devices: [...devices, deviceId], max: limit };
-  await writeBinding(id, next);
+  try {
+    await writeBinding(id, next);
+  } catch {
+    // Write failed — re-read: a concurrent registration may have filled the slots.
+    try {
+      const again = (await get<Binding>(id)) ?? null;
+      const devs: string[] = again?.devices ?? [];
+      if (!devs.includes(deviceId) && devs.length >= limit) {
+        return { ok: false, reason: "device_limit", devices: devs.length };
+      }
+    } catch {}
+  }
   return { ok: true, devices: next.devices.length };
 }
 
