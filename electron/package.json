@@ -2,6 +2,8 @@
   "name": "switchclaude-app",
   "version": "1.0.0",
   "description": "Switch Claude accounts in 2 seconds — macOS, Windows, Linux",
+  "author": "SwitchClaude <info@lv8.gr>",
+  "homepage": "https://switchclaude.vercel.app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
