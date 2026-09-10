@@ -8,6 +8,14 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 
+function deviceId() {
+  try {
+    return require("node-machine-id").machineIdSync().slice(0, 64);
+  } catch {
+    return (os.hostname() + ":" + os.userInfo().username).slice(0, 64);
+  }
+}
+
 const API = "https://switchclaude.com/api/validate";
 const STORE = path.join(os.homedir(), "claude-switcher");
 const PROFILES = path.join(STORE, "profiles.json");
@@ -41,15 +49,16 @@ function isFresh(lic) {
 // ---------- license ----------
 async function activateLicense(key) {
   key = (key || "").trim();
+  const device = deviceId();
   try {
-    const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key }) });
+    const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, deviceId: device }) });
     const j = await r.json();
     if (j.valid) {
-      const lic = { key, accounts: j.accounts || 0, validatedAt: Date.now() };
+      const lic = { key, accounts: j.accounts || 0, deviceId: device, validatedAt: Date.now() };
       saveLicense(lic);
       return { ok: true, accounts: lic.accounts, offline: false };
     }
-    return { ok: false, error: "Invalid key." };
+    return { ok: false, error: j.message || "Invalid key." };
   } catch {
     // Offline: accept the stored key if its cache is still fresh.
     const stored = loadLicense();
@@ -194,6 +203,12 @@ app.whenReady().then(() => {
     win.center();
     win.show();
     win.focus();
+  }
+  // Silent revalidation: registers this machine, refreshes the 7-day cache.
+  // Offline or failed → stored license stays untouched.
+  const stored = loadLicense();
+  if (stored && stored.key) {
+    activateLicense(stored.key).then(() => { buildTray(); pushState(); }).catch(() => {});
   }
 });
 app.on("window-all-closed", () => {});
