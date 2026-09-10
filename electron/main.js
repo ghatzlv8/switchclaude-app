@@ -149,7 +149,7 @@ function buildTray() {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 420, height: 600, show: false,
+    width: 420, height: 600, show: false, center: true,
     webPreferences: { preload: path.join(__dirname, "preload.js") },
   });
   win.loadFile(path.join(__dirname, "index.html"));
@@ -167,5 +167,12 @@ app.whenReady().then(() => {
   fs.mkdirSync(path.join(STORE, "profiles"), { recursive: true });
   createWindow();
   buildTray();
+  // Show window on manual launch; stay in tray when auto-started at login.
+  const s = loadProfiles();
+  if (!app.getLoginItemSettings().wasOpenedAtLogin || s.accounts.length === 0) {
+    win.center();
+    win.show();
+    win.focus();
+  }
 });
 app.on("window-all-closed", () => {});
