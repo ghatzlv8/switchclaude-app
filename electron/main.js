@@ -215,6 +215,14 @@ app.whenReady().then(() => {
   }
 });
 app.on("window-all-closed", () => {});
+// Single instance: a second launch focuses the existing window instead of
+// starting a parallel app (parallel instances corrupt the shared profile).
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => { if (win && !win.isDestroyed()) { win.center(); win.show(); win.focus(); } });
+}
 // Dock click (or Cmd+Tab + click) must always bring the window back —
 // closing the window only hides it to the tray, it doesn't quit.
 app.on("activate", () => { if (win && !win.isDestroyed()) { win.center(); win.show(); win.focus(); } });

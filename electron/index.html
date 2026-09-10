@@ -38,7 +38,7 @@ async function refresh(){
   plan.className = 'plan ' + s.plan;
   plan.textContent = s.plan === 'pro' ? `Pro — ${s.max} accounts` : 'Free — 1 account';
   document.getElementById('list').innerHTML = s.accounts.map(a =>
-    `<div class="acc ${a.id===s.active?'active':'idle'}"><span>${a.id===s.active?'● ':''}${a.label} <a href="#" onclick="rn('${a.id}','${a.label.replace(/'/g,"\\'")}');return false" style="font-size:11px;opacity:.6;color:inherit">✎</a></span>` +
+    `<div class="acc ${a.id===s.active?'active':'idle'}"><span id="lbl-${a.id}">${a.id===s.active?'● ':''}${a.label} <a href="#" onclick="rn('${a.id}','${a.label.replace(/'/g,"\\'")}');return false" style="font-size:11px;opacity:.6;color:inherit">✎</a></span>` +
     (a.id===s.active ? `<span style="font-size:11px;opacity:.7">Active</span>` : `<button onclick="sw('${a.id}')">Switch →</button>`) + `</div>`
   ).join('') || '<div class="note">No accounts yet — add your first below.</div>';
   const full = s.accounts.length >= s.max;
@@ -55,14 +55,25 @@ async function add(){
 async function sw(id){ await window.api.switchTo(id); refresh(); }
 async function rn(id, cur){
   try {
-    if(!window.api || !window.api.rename){ alert('Bridge error: rename unavailable. Restart the app.'); return; }
-    var v = prompt('Rename account:', cur);
-    if(!v) return;
-    var r = await window.api.rename(id, v);
-    if(!r || !r.ok){ alert('Rename failed.'); return; }
-    refresh();
-  } catch(err){ alert('Rename error: ' + err.message); }
+    if(!window.api || !window.api.rename){ msg('Bridge error: restart the app.', false); return; }
+    var span = document.getElementById('lbl-' + id);
+    if(!span) return;
+    if(span.querySelector('input')) return;
+    span.innerHTML = '<input id="edit-' + id + '" value="' + cur.replace(/"/g,'&quot;') + '" style="width:150px;padding:4px 6px;border:1px solid #533afd;border-radius:4px;font-size:13px"> ' +
+      '<button onclick="rnsave(\'' + id + '\')" style="background:#533afd;color:#fff;border:0;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px">Save</button>';
+    var inp = document.getElementById('edit-' + id);
+    inp.focus(); inp.select();
+    inp.onkeydown = function(e){ if(e.key==='Enter') rnsave(id); if(e.key==='Escape') refresh(); };
+  } catch(err){ msg('Rename error: ' + err.message, false); }
 }
+async function rnsave(id){
+  var inp = document.getElementById('edit-' + id);
+  if(!inp || !inp.value.trim()){ refresh(); return; }
+  var r = await window.api.rename(id, inp.value.trim());
+  if(!r || !r.ok){ msg('Rename failed.', false); return; }
+  refresh();
+}
+function msg(t, ok){ var m=document.getElementById('msg'); m.className='msg '+(ok?'ok':'err'); m.textContent=t; }
 async function save(){
   const m = document.getElementById('msg');
   const r = await window.api.activate(document.getElementById('k').value);
