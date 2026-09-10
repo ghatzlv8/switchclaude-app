@@ -9,8 +9,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
-            args: --mac dmg
           - os: windows-latest
             args: --win nsis
           - os: ubuntu-latest

@@ -1,20 +1,24 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server";
 
-const BUILDS: Record<string, { file: string; note: string }> = {
-  mac: { file: "SwitchClaude-1.0.0.dmg", note: "macOS 12+ (Apple Silicon & Intel). Right-click → Open → Allow once." },
-  win: { file: "SwitchClaude-Setup-1.0.0.exe", note: "Windows 10+. NSIS installer." },
-  linux: { file: "SwitchClaude-1.0.0.AppImage", note: "Ubuntu 20+ / any distro. chmod +x then run." },
-}
+const REPO = "https://github.com/giorgosHLaggis/switchclaude-app";
+const TAG = "v1.0.0";
+const FILES: Record<string, string> = {
+  mac: "SwitchClaude-1.0.0-arm64.dmg",
+  win: "SwitchClaude Setup 1.0.0.exe",
+  linux: "SwitchClaude-1.0.0.AppImage",
+};
 
+// Redirect to the real binary. If the asset isn't published yet (CI still
+// building), send the user to the releases page instead of a JSON blob.
 export async function GET(req: NextRequest) {
-  const platform = new URL(req.url).searchParams.get("platform") || "mac"
-  const b = BUILDS[platform] ?? BUILDS.mac
-  return NextResponse.json({
-    platform,
-    file: b.file,
-    note: b.note,
-    license: "Paste your CLAUDE-SWITCHER-XXXX key in Settings → License to unlock extra accounts.",
-    // Binaries ship via GitHub Releases in prod; this endpoint returns the manifest for the app auto-updater.
-    releases: "https://github.com/switchclaude/app/releases/latest",
-  })
+  const platform = new URL(req.url).searchParams.get("platform") || "mac";
+  const file = FILES[platform] ?? FILES.mac;
+  const asset = `${REPO}/releases/download/${TAG}/${encodeURIComponent(file).replace(/%20/g, "%20")}`;
+  try {
+    const head = await fetch(asset, { method: "HEAD", redirect: "manual" });
+    if (head.status === 200 || head.status === 302) {
+      return NextResponse.redirect(asset, 302);
+    }
+  } catch {}
+  return NextResponse.redirect(`${REPO}/releases/tag/${TAG}`, 302);
 }
