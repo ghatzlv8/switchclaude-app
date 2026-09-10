@@ -22,6 +22,8 @@ export default function Page(){
       </div>
       <script dangerouslySetInnerHTML={{__html: `(function(){
         var KEY='sc-consent';
+        var mem=null; // in-memory fallback if localStorage is blocked
+        function read(){ if(mem) return mem; try{ var v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
         function loadFonts(){
           if(document.getElementById('sc-fonts')) return;
           var l=document.createElement('link');
@@ -29,13 +31,14 @@ export default function Page(){
           l.href='https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap';
           document.head.appendChild(l);
         }
-        function read(){ try{ var v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
         function apply(c){ if(c && c.fonts) loadFonts(); }
         function show(){ var b=document.getElementById('consent'); if(b) b.style.display='block'; var f=document.getElementById('cookie-fab'); if(f) f.style.display='none'; }
         function hide(){ var b=document.getElementById('consent'); if(b) b.style.display='none'; var f=document.getElementById('cookie-fab'); if(f) f.style.display='block'; }
         function save(fonts){
-          try{ localStorage.setItem(KEY, JSON.stringify({necessary:true, fonts:!!fonts, ts:Date.now()})); }catch(e){}
-          apply({fonts:fonts}); hide();
+          mem={necessary:true, fonts:!!fonts, ts:Date.now()};
+          try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){}
+          apply(mem); hide();
+          var b=document.getElementById('c-accept'); if(b && fonts){ b.textContent='Saved ✓'; }
         }
         function wire(id, fn){ var el=document.getElementById(id); if(el) el.onclick=fn; }
         function boot(){
