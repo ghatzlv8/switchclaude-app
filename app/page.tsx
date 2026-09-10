@@ -119,6 +119,24 @@ export default function Page(){
 
         <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • info@lv8.gr</footer>
       </div>
+      <div id="proof" style={{display:"none", position:"fixed", left:16, bottom:16, zIndex:50, background:"#fff", border:"1px solid #e5edf5", borderRadius:8, padding:"12px 14px", maxWidth:280, boxShadow:"rgba(50,50,93,0.25) 0px 13px 27px -5px, rgba(0,0,0,0.1) 0px 8px 16px -8px", fontSize:13}}></div>
+      <script dangerouslySetInnerHTML={{__html: `(function(){
+        var box=document.getElementById('proof'); if(!box) return;
+        fetch('/api/social').then(function(r){return r.json()}).then(function(j){
+          if(!j.sales || !j.sales.length) return; // no sales yet → stay hidden
+          var i=0;
+          function show(){
+            var s=j.sales[i%j.sales.length];
+            var where=s.country?(' from '+s.country):'';
+            box.innerHTML='<div style="display:flex;gap:10px;align-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#533afd;color:#fff;display:grid;place-items:center;font-weight:600">✓</span><div><b>Someone'+where+'</b> just got <b>SwitchClaude '+s.plan+'</b><div style="font-size:11px;color:#64748d">'+s.age+' • verified purchase</div></div></div>';
+            box.style.display='block';
+            setTimeout(function(){ box.style.display='none'; }, 5000);
+            i++;
+            setTimeout(show, 12000);
+          }
+          setTimeout(show, 4000);
+        }).catch(function(){});
+      })();`}} />
     </>
   )
 }
