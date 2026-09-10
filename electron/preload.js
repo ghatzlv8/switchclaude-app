@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld("api", {
   getState: () => ipcRenderer.invoke("accounts:list"),
   addAccount: () => ipcRenderer.invoke("accounts:add"),
   switchTo: (id) => ipcRenderer.invoke("accounts:switch", id),
+  rename: (id, label) => ipcRenderer.invoke("accounts:rename", { id, label }),
   onState: (fn) => ipcRenderer.on("state", (_, s) => fn(s)),
   onFocusLicense: (fn) => ipcRenderer.on("focus-license", fn),
 });

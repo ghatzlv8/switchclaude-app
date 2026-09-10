@@ -171,6 +171,18 @@ ipcMain.handle("license:status", () => licenseStatus());
 ipcMain.handle("accounts:list", () => state());
 ipcMain.handle("accounts:add", () => addAccount());
 ipcMain.handle("accounts:switch", (_, id) => { switchTo(id); return { ok: true }; });
+ipcMain.handle("accounts:rename", (_, { id, label }) => {
+  label = (label || "").trim().slice(0, 60);
+  if (!label) return { ok: false };
+  const s = loadProfiles();
+  const a = s.accounts.find(x => x.id === id);
+  if (!a) return { ok: false };
+  a.label = label;
+  saveProfiles(s);
+  buildTray();
+  pushState();
+  return { ok: true };
+});
 
 app.whenReady().then(() => {
   fs.mkdirSync(path.join(STORE, "profiles"), { recursive: true });

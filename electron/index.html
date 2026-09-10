@@ -38,7 +38,7 @@ async function refresh(){
   plan.className = 'plan ' + s.plan;
   plan.textContent = s.plan === 'pro' ? `Pro — ${s.max} accounts` : 'Free — 1 account';
   document.getElementById('list').innerHTML = s.accounts.map(a =>
-    `<div class="acc ${a.id===s.active?'active':'idle'}"><span>${a.id===s.active?'● ':''}${a.label}</span>` +
+    `<div class="acc ${a.id===s.active?'active':'idle'}"><span>${a.id===s.active?'● ':''}${a.label} <a href="#" onclick="rn('${a.id}','${a.label.replace(/'/g,"\\'")}');return false" style="font-size:11px;opacity:.6;color:inherit">✎</a></span>` +
     (a.id===s.active ? `<span style="font-size:11px;opacity:.7">Active</span>` : `<button onclick="sw('${a.id}')">Switch →</button>`) + `</div>`
   ).join('') || '<div class="note">No accounts yet — add your first below.</div>';
   const full = s.accounts.length >= s.max;
@@ -53,6 +53,10 @@ async function add(){
   refresh();
 }
 async function sw(id){ await window.api.switchTo(id); refresh(); }
+async function rn(id, cur){
+  const v = prompt('Rename account:', cur);
+  if (v) { await window.api.rename(id, v); refresh(); }
+}
 async function save(){
   const m = document.getElementById('msg');
   const r = await window.api.activate(document.getElementById('k').value);
