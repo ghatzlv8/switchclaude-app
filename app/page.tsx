@@ -5,7 +5,51 @@ export const metadata = { title: "SwitchClaude — Switch Claude accounts in 2 s
 export default function Page(){
   return (
     <>
-      <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
+      <div id="consent" style={{display:"none", position:"fixed", left:0, right:0, bottom:0, zIndex:60, background:"#061b31", color:"#fff", padding:"16px 24px"}}>
+        <div style={{maxWidth:1080, margin:"0 auto", display:"flex", gap:16, alignItems:"center", justifyContent:"space-between", flexWrap:"wrap"}}>
+          <div style={{fontSize:13, maxWidth:640}}>We use only strictly-necessary storage plus optional Google Fonts. No tracking, no ads. <a href="/privacy" style={{color:"#b9b9f9"}}>Privacy policy</a></div>
+          <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
+            <button id="c-reject" style={{background:"transparent", border:"1px solid #b9b9f9", color:"#fff", padding:"8px 14px", borderRadius:4, cursor:"pointer"}}>Reject</button>
+            <button id="c-custom" style={{background:"transparent", border:"1px solid #e5edf5", color:"#fff", padding:"8px 14px", borderRadius:4, cursor:"pointer"}}>Customize</button>
+            <button id="c-accept" style={{background:"#533afd", border:0, color:"#fff", padding:"8px 14px", borderRadius:4, cursor:"pointer", fontWeight:600}}>Accept all</button>
+          </div>
+        </div>
+        <div id="c-detail" style={{display:"none", maxWidth:1080, margin:"12px auto 0", fontSize:13, background:"rgba(255,255,255,0.06)", borderRadius:6, padding:12}}>
+          <label style={{display:"block", marginBottom:8}}><input type="checkbox" checked disabled /> Strictly necessary (consent record) — always on</label>
+          <label style={{display:"block"}}><input type="checkbox" id="c-fonts" /> Enhanced fonts (loads from Google CDN — sends your IP to Google)</label>
+          <div style={{marginTop:10}}><button id="c-save" style={{background:"#533afd", border:0, color:"#fff", padding:"8px 14px", borderRadius:4, cursor:"pointer", fontWeight:600}}>Save choice</button></div>
+        </div>
+      </div>
+      <script dangerouslySetInnerHTML={{__html: `(function(){
+        var KEY='sc-consent';
+        function loadFonts(){
+          if(document.getElementById('sc-fonts')) return;
+          var l=document.createElement('link');
+          l.id='sc-fonts'; l.rel='stylesheet';
+          l.href='https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap';
+          document.head.appendChild(l);
+        }
+        function read(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+        function apply(c){ if(c && c.fonts) loadFonts(); }
+        function show(){ document.getElementById('consent').style.display='block'; }
+        function hide(){ document.getElementById('consent').style.display='none'; }
+        function save(fonts){
+          try{ localStorage.setItem(KEY, JSON.stringify({necessary:true, fonts:!!fonts, ts:Date.now()})); }catch(e){}
+          apply({fonts:fonts}); hide();
+        }
+        var cur=read();
+        if(cur){ apply(cur); }
+        else { show(); }
+        document.getElementById('c-accept').onclick=function(){ save(true); };
+        document.getElementById('c-reject').onclick=function(){ save(false); };
+        document.getElementById('c-custom').onclick=function(){
+          var d=document.getElementById('c-detail');
+          d.style.display = d.style.display==='none' ? 'block' : 'none';
+        };
+        document.getElementById('c-save').onclick=function(){ save(document.getElementById('c-fonts').checked); };
+        window.scCookies=function(){ try{localStorage.removeItem(KEY);}catch(e){} show(); };
+      })();`}} />
+      {/* Fonts load only after consent (see consent script) — system stack before that. */}
       <style>{`* { font-feature-settings: "ss01"; }
         body { font-family: 'Source Sans 3', system-ui, sans-serif; margin: 0; }
         .hero-grid { max-width: 1080px; margin: 0 auto; padding: 64px 24px 40px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: center; }
@@ -117,7 +161,7 @@ export default function Page(){
           <div style={{marginTop:8, fontSize:11, color:"#64748d"}}>macOS 12+ • Windows 10+ • Ubuntu 20+ • No Apple Developer needed.</div>
         </section>
 
-        <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • info@lv8.gr</footer>
+        <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • info@lv8.gr • <a href="/privacy" style={{color:"#64748d"}}>Privacy</a> • <a href="#" onClick={(e)=>{e.preventDefault(); (window as unknown as {scCookies:()=>void}).scCookies();}} style={{color:"#64748d"}}>Cookie settings</a></footer>
       </div>
       <div id="proof" style={{display:"none", position:"fixed", left:16, bottom:16, zIndex:50, background:"#fff", border:"1px solid #e5edf5", borderRadius:8, padding:"12px 14px", maxWidth:280, boxShadow:"rgba(50,50,93,0.25) 0px 13px 27px -5px, rgba(0,0,0,0.1) 0px 8px 16px -8px", fontSize:13}}></div>
       <script dangerouslySetInnerHTML={{__html: `(function(){
