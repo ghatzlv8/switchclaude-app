@@ -84,12 +84,16 @@ function launchProfile(id) {
   p.unref();
 }
 
-function switchTo(id) {
+function killClaude() {
   try {
     if (process.platform === "darwin") spawn("pkill", ["-x", "Claude"]);
     else if (process.platform === "win32") spawn("taskkill", ["/IM", "Claude.exe", "/F"]);
     else spawn("pkill", ["-f", "Claude"]);
   } catch {}
+}
+
+function switchTo(id) {
+  killClaude();
   setTimeout(() => {
     launchProfile(id);
     const s = loadProfiles(); s.active = id; saveProfiles(s);
@@ -109,9 +113,14 @@ function addAccount() {
   s.accounts.push({ id, label });
   s.active = id;
   saveProfiles(s);
-  launchProfile(id); // opens empty Claude → user logs in once
-  buildTray();
-  pushState();
+  // Kill first: otherwise the OS reuses the already-running Claude window
+  // and the login would land in the wrong account instead of the new profile.
+  killClaude();
+  setTimeout(() => {
+    launchProfile(id); // opens empty Claude → user logs in once, saved in this profile
+    buildTray();
+    pushState();
+  }, 1200);
   return { ok: true, id, label };
 }
 
