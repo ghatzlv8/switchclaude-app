@@ -1,0 +1,5 @@
+.env
+.env.local
+node_modules/
+electron/dist/
+electron/node_modules/

@@ -1,0 +1,21 @@
+appId: com.switchclaude.app
+productName: SwitchClaude
+directories:
+  output: dist
+files:
+  - main.js
+  - preload.js
+  - index.html
+  - package.json
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+win:
+  target:
+    - nsis
+linux:
+  category: Utility
+  target:
+    - AppImage
+    - deb

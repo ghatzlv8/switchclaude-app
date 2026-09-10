@@ -1,0 +1,16 @@
+{
+  "name": "switchclaude-app",
+  "version": "1.0.0",
+  "description": "Switch Claude accounts in 2 seconds — macOS, Windows, Linux",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac dmg",
+    "dist:win": "electron-builder --win nsis",
+    "dist:linux": "electron-builder --linux AppImage deb"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
