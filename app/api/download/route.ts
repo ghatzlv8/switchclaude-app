@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const REPO = "https://github.com/giorgosHLaggis/switchclaude-app";
+const REPO = "https://github.com/ghatzlv8/switchclaude-app";
 const TAG = "v1.0.0";
 const FILES: Record<string, string> = {
   mac: "SwitchClaude-1.0.0-arm64.dmg",
