@@ -22,7 +22,7 @@ export default async function Success({ searchParams }: { searchParams: { sessio
           <a href="/#download" style={{ display: "inline-block", marginTop: 12, background: "#533afd", color: "#fff", padding: "10px 18px", borderRadius: 4, textDecoration: "none" }}>Download SwitchClaude</a>
         </>
       ) : (
-        <p style={{ color: "#a00" }}>Could not issue license ({error}). Contact support@switchclaude.com with your receipt.</p>
+        <p style={{ color: "#a00" }}>Could not issue license ({error}). Contact info@lv8.gr with your receipt.</p>
       )}
     </div>
   );

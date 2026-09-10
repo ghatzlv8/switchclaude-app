@@ -100,7 +100,7 @@ export default function Page(){
           <div style={{marginTop:8, fontSize:11, color:"#64748d"}}>macOS 12+ • Windows 10+ • Ubuntu 20+ • No Apple Developer needed.</div>
         </section>
 
-        <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • support@switchclaude.com</footer>
+        <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • info@lv8.gr</footer>
       </div>
     </>
   )
