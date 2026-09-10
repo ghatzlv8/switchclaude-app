@@ -54,8 +54,14 @@ async function add(){
 }
 async function sw(id){ await window.api.switchTo(id); refresh(); }
 async function rn(id, cur){
-  const v = prompt('Rename account:', cur);
-  if (v) { await window.api.rename(id, v); refresh(); }
+  try {
+    if(!window.api || !window.api.rename){ alert('Bridge error: rename unavailable. Restart the app.'); return; }
+    var v = prompt('Rename account:', cur);
+    if(!v) return;
+    var r = await window.api.rename(id, v);
+    if(!r || !r.ok){ alert('Rename failed.'); return; }
+    refresh();
+  } catch(err){ alert('Rename error: ' + err.message); }
 }
 async function save(){
   const m = document.getElementById('msg');

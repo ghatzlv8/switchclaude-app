@@ -170,6 +170,9 @@ function createWindow() {
     width: 420, height: 600, show: false, center: true,
     webPreferences: { preload: path.join(__dirname, "preload.js") },
   });
+  win.webContents.on("console-message", (_, level, message, line, source) => {
+    try { fs.appendFileSync(path.join(os.tmpdir(), "sc-render.log"), `[${level}] ${source}:${line} ${message}\n`); } catch {}
+  });
   win.loadFile(path.join(__dirname, "index.html"));
   win.webContents.on("did-finish-load", pushState);
   win.on("close", e => { if (!app.quitting) { e.preventDefault(); win.hide(); } });
