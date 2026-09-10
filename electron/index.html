@@ -1,22 +1,67 @@
 <!doctype html><html><head><meta charset="utf-8"><style>
 body{font-family:system-ui,sans-serif;margin:0;padding:24px;color:#061b31}
-h1{font-weight:300}input{width:100%;padding:10px;border:1px solid #e5edf5;border-radius:4px}
-button{background:#533afd;color:#fff;border:0;padding:10px 16px;border-radius:4px;margin-top:12px;cursor:pointer}
-.note{font-size:12px;color:#64748d;margin-top:12px}
+h1{font-weight:300;margin:0 0 4px}
+.sub{font-size:12px;color:#64748d;margin-bottom:16px}
+.plan{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;margin-bottom:12px}
+.plan.free{background:#f6f9fc;border:1px solid #e5edf5;color:#64748d}
+.plan.pro{background:rgba(21,190,83,.12);border:1px solid rgba(21,190,83,.35);color:#108c3d}
+.acc{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:6px;margin-bottom:8px;font-size:14px}
+.acc.active{background:#061b31;color:#fff}
+.acc.idle{border:1px solid #e5edf5;background:#fff}
+.acc button{background:#533afd;color:#fff;border:0;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px}
+.acc.active button{background:rgba(255,255,255,.15)}
+button.primary{background:#533afd;color:#fff;border:0;padding:10px 16px;border-radius:4px;margin-top:8px;cursor:pointer;width:100%;font-size:14px}
+button.primary:disabled{background:#c9cdfb;cursor:default}
+input{width:100%;box-sizing:border-box;padding:10px;border:1px solid #e5edf5;border-radius:4px;margin-top:8px}
+label{font-size:13px;font-weight:600}
+.note{font-size:12px;color:#64748d;margin-top:12px;line-height:1.5}
+.msg{font-size:13px;margin-top:8px}
+.msg.ok{color:#108c3d}.msg.err{color:#c00}
+hr{border:0;border-top:1px solid #e5edf5;margin:20px 0}
 </style></head><body>
 <h1>SwitchClaude</h1>
-<p>Switch Claude accounts in 2 seconds.</p>
+<div class="sub">Switch Claude accounts in 2 seconds.</div>
+<div id="plan" class="plan free">Free</div>
+<div id="list"></div>
+<button id="add" class="primary" onclick="add()">+ Add Account</button>
+<div id="limit" class="note" style="display:none">Limit reached. <a href="https://switchclaude.com/#pricing">Get more accounts — $9.99 one-time</a>.</div>
+<hr>
 <label>License key</label>
 <input id="k" placeholder="CLAUDE-SWITCHER-XXXX-XXXX">
-<button onclick="save()">Activate</button>
-<div class="note">1 account free. Extra accounts $9.99 one-time at switchclaude.com.<br>No subscription. Cached 7 days for offline use.</div>
+<button class="primary" onclick="save()">Activate</button>
+<div id="msg" class="msg"></div>
+<div class="note">1 account free. Extra accounts $9.99 one-time at switchclaude.com.<br>Key is saved on this Mac and works offline for 7 days.</div>
 <script>
-async function save(){
-  const key=document.getElementById('k').value.trim();
-  const r=await fetch('https://switchclaude.com/api/validate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key})});
-  const j=await r.json();
-  alert(j.valid?'License valid — extra accounts unlocked.':'Invalid key.');
+async function refresh(){
+  const s = await window.api.getState();
+  const plan = document.getElementById('plan');
+  plan.className = 'plan ' + s.plan;
+  plan.textContent = s.plan === 'pro' ? `Pro — ${s.max} accounts` : 'Free — 1 account';
+  document.getElementById('list').innerHTML = s.accounts.map(a =>
+    `<div class="acc ${a.id===s.active?'active':'idle'}"><span>${a.id===s.active?'● ':''}${a.label}</span>` +
+    (a.id===s.active ? `<span style="font-size:11px;opacity:.7">Active</span>` : `<button onclick="sw('${a.id}')">Switch →</button>`) + `</div>`
+  ).join('') || '<div class="note">No accounts yet — add your first below.</div>';
+  const full = s.accounts.length >= s.max;
+  document.getElementById('add').disabled = full;
+  document.getElementById('limit').style.display = full ? 'block' : 'none';
 }
-window.api?.onFocusLicense(()=>document.getElementById('k').focus());
+async function add(){
+  const r = await window.api.addAccount();
+  const m = document.getElementById('msg');
+  if (!r.ok) { m.className='msg err'; m.textContent = r.error; }
+  else { m.className='msg ok'; m.textContent = 'Claude opened — log in once to link ' + r.label + '.'; }
+  refresh();
+}
+async function sw(id){ await window.api.switchTo(id); refresh(); }
+async function save(){
+  const m = document.getElementById('msg');
+  const r = await window.api.activate(document.getElementById('k').value);
+  m.className = 'msg ' + (r.ok ? 'ok' : 'err');
+  m.textContent = r.ok ? (r.offline ? 'Offline — cached license accepted.' : 'License valid — extra accounts unlocked.') : r.error;
+  refresh();
+}
+window.api.onState(refresh);
+window.api.onFocusLicense(() => document.getElementById('k').focus());
+refresh();
 </script>
 </body></html>
