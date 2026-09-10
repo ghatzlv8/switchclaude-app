@@ -29,27 +29,33 @@ export default function Page(){
           l.href='https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap';
           document.head.appendChild(l);
         }
-        function read(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+        function read(){ try{ var v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
         function apply(c){ if(c && c.fonts) loadFonts(); }
-        function show(){ document.getElementById('consent').style.display='block'; }
-        function hide(){ document.getElementById('consent').style.display='none'; }
+        function show(){ var b=document.getElementById('consent'); if(b) b.style.display='block'; var f=document.getElementById('cookie-fab'); if(f) f.style.display='none'; }
+        function hide(){ var b=document.getElementById('consent'); if(b) b.style.display='none'; var f=document.getElementById('cookie-fab'); if(f) f.style.display='block'; }
         function save(fonts){
           try{ localStorage.setItem(KEY, JSON.stringify({necessary:true, fonts:!!fonts, ts:Date.now()})); }catch(e){}
           apply({fonts:fonts}); hide();
         }
-        var cur=read();
-        if(cur){ apply(cur); }
-        else { show(); }
-        document.getElementById('c-accept').onclick=function(){ save(true); };
-        document.getElementById('c-reject').onclick=function(){ save(false); };
-        document.getElementById('c-custom').onclick=function(){
-          var d=document.getElementById('c-detail');
-          d.style.display = d.style.display==='none' ? 'block' : 'none';
-        };
-        document.getElementById('c-save').onclick=function(){ save(document.getElementById('c-fonts').checked); };
-        var opener=document.getElementById('c-open');
-        if(opener){ opener.onclick=function(e){ e.preventDefault(); try{localStorage.removeItem(KEY);}catch(x){} show(); }; }
+        function wire(id, fn){ var el=document.getElementById(id); if(el) el.onclick=fn; }
+        function boot(){
+          var cur=read();
+          if(cur){ apply(cur); hide(); } else { show(); }
+          setTimeout(function(){ if(!read()) show(); }, 800);
+          setTimeout(function(){ if(!read()) show(); }, 2500);
+        }
+        wire('c-accept', function(){ save(true); });
+        wire('c-reject', function(){ save(false); });
+        wire('c-custom', function(){
+          var d=document.getElementById('c-detail'); if(!d) return;
+          d.style.display = (d.style.display==='none' || !d.style.display) ? 'block' : 'none';
+        });
+        wire('c-save', function(){ var c=document.getElementById('c-fonts'); save(c && c.checked); });
+        wire('c-open', function(e){ if(e) e.preventDefault(); try{localStorage.removeItem(KEY);}catch(x){} show(); });
+        wire('cookie-fab', function(){ try{localStorage.removeItem(KEY);}catch(x){} show(); });
         window.scCookies=function(){ try{localStorage.removeItem(KEY);}catch(e){} show(); };
+        if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', boot); }
+        else { boot(); }
       })();`}} />
       {/* Fonts load only after consent (see consent script) — system stack before that. */}
       <style>{`* { font-feature-settings: "ss01"; }
@@ -166,6 +172,7 @@ export default function Page(){
         <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • info@lv8.gr • <a href="/privacy" style={{color:"#64748d"}}>Privacy</a> • <a href="#" id="c-open" style={{color:"#64748d"}}>Cookie settings</a></footer>
       </div>
       <div id="proof" style={{display:"none", position:"fixed", left:16, bottom:16, zIndex:50, background:"#fff", border:"1px solid #e5edf5", borderRadius:8, padding:"12px 14px", maxWidth:280, boxShadow:"rgba(50,50,93,0.25) 0px 13px 27px -5px, rgba(0,0,0,0.1) 0px 8px 16px -8px", fontSize:13}}></div>
+      <button id="cookie-fab" title="Cookie settings" style={{display:"none", position:"fixed", left:16, bottom:16, zIndex:55, width:40, height:40, borderRadius:"50%", border:"1px solid #e5edf5", background:"#fff", cursor:"pointer", fontSize:18}}>🍪</button>
       <script dangerouslySetInnerHTML={{__html: `(function(){
         var box=document.getElementById('proof'); if(!box) return;
         fetch('/api/social').then(function(r){return r.json()}).then(function(j){
