@@ -41,6 +41,20 @@ export default function Page(){
           var b=document.getElementById('c-accept'); if(b && fonts){ b.textContent='Saved ✓'; }
         }
         function wire(id, fn){ var el=document.getElementById(id); if(el) el.onclick=fn; }
+        // Delegated clicks survive React hydration node replacement.
+        document.addEventListener('click', function(e){
+          var t=e.target && e.target.closest ? e.target.closest('#c-accept,#c-reject,#c-custom,#c-save,#c-open,#cookie-fab') : null;
+          if(!t) return;
+          if(t.id==='c-accept'){ save(true); }
+          else if(t.id==='c-reject'){ save(false); }
+          else if(t.id==='c-custom'){
+            var d=document.getElementById('c-detail'); if(!d) return;
+            d.style.display=(d.style.display==='none'||!d.style.display)?'block':'none';
+          }
+          else if(t.id==='c-save'){ var c=document.getElementById('c-fonts'); save(c && c.checked); }
+          else if(t.id==='c-open'){ e.preventDefault(); try{localStorage.removeItem(KEY);}catch(x){} show(); }
+          else if(t.id==='cookie-fab'){ try{localStorage.removeItem(KEY);}catch(x){} show(); }
+        });
         function boot(){
           var cur=read();
           if(cur){ apply(cur); hide(); } else { show(); }

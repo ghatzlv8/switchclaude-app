@@ -2,10 +2,10 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/api/checkout/route": "app/api/checkout/route.js",
   "/api/license/route": "app/api/license/route.js",
-  "/api/download/route": "app/api/download/route.js",
   "/api/validate/route": "app/api/validate/route.js",
+  "/api/download/route": "app/api/download/route.js",
   "/success/page": "app/success/page.js",
-  "/privacy/page": "app/privacy/page.js",
   "/api/social/route": "app/api/social/route.js",
+  "/privacy/page": "app/privacy/page.js",
   "/page": "app/page.js"
 }
