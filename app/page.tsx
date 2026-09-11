@@ -1,10 +1,42 @@
 import "./globals.css"
 
-export const metadata = { title: "SwitchClaude — Switch Claude accounts in 2 seconds", description: "The WiFi switch for Claude Desktop. Isolated profiles, never lost chats." }
-
 export default function Page(){
+  const faq = [
+    ["How fast is switching, really?", "About 2 seconds. SwitchClaude quits Claude Desktop and relaunches it with the other account's isolated profile."],
+    ["Are my chats and projects safe?", "Yes. Each account lives in its own profile directory. Switching never deletes, merges, or touches your data."],
+    ["Does it work with Google login?", "Yes. Log in once per profile (email or Google) — the session stays saved in that profile."],
+    ["Which platforms are supported?", "macOS 12+, Windows 10+, and Ubuntu 20+ (plus most Linux distros). One codebase, native installers for each."],
+    ["Is there a subscription?", "No. You pay once per extra account ($9.99) or $29 for Team (up to 5 accounts). Lifetime updates included."],
+    ["What if I get a new computer?", "Licenses are bound to devices (1 + your extra accounts). Email info@lv8.gr and we reset the binding."],
+  ];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        name: "SwitchClaude",
+        applicationCategory: "UtilitiesApplication",
+        operatingSystem: ["macOS", "Windows", "Linux"],
+        url: "https://switchclaude.com",
+        description: "Menubar switcher for Claude Desktop. Swap between multiple Claude accounts in 2 seconds with isolated profiles.",
+        offers: [
+          { "@type": "Offer", name: "Starter", price: "0", priceCurrency: "USD" },
+          { "@type": "Offer", name: "Pro — per extra account", price: "9.99", priceCurrency: "USD" },
+          { "@type": "Offer", name: "Team — up to 5 accounts", price: "29", priceCurrency: "USD" },
+        ],
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faq.map(([q, a]) => ({
+          "@type": "Question", name: q,
+          acceptedAnswer: { "@type": "Answer", text: a },
+        })),
+      },
+    ],
+  };
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div id="consent" style={{display:"none", position:"fixed", left:0, right:0, bottom:0, zIndex:60, background:"#061b31", color:"#fff", padding:"16px 24px"}}>
         <div style={{maxWidth:1080, margin:"0 auto", display:"flex", gap:16, alignItems:"center", justifyContent:"space-between", flexWrap:"wrap"}}>
           <div style={{fontSize:13, maxWidth:640}}>We use only strictly-necessary storage plus optional Google Fonts. No tracking, no ads. <a href="/privacy" style={{color:"#b9b9f9"}}>Privacy policy</a></div>
@@ -168,6 +200,19 @@ export default function Page(){
               <div style={{fontWeight:600}}>Team</div><div style={{fontSize:32, fontWeight:300, marginTop:8}}>$29</div><div style={{fontSize:13, color:"#64748d"}}>Up to 5 accounts • One-time</div>
               <a href="/api/checkout?accounts=4" style={{display:"block", marginTop:16, textAlign:"center", padding:"10px 0", borderRadius:4, background:"#061b31", color:"#fff", textDecoration:"none", fontWeight:500}}>Buy Team — $29</a>
             </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" style={{maxWidth:1080, margin:"0 auto", padding:"40px 24px", borderTop:"1px solid #e5edf5"}}>
+          <h2 className="sec-h2">Frequently asked questions</h2>
+          <div className="cards-grid">
+            {faq.map(([q,a])=>(
+              <div key={q} style={{border:"1px solid #e5edf5", borderRadius:6, padding:20, background:"#fff"}}>
+                <div style={{fontWeight:600, color:"#061b31", fontSize:15}}>{q}</div>
+                <div style={{marginTop:8, fontSize:14, color:"#64748d", lineHeight:1.5}}>{a}</div>
+              </div>
+            ))}
           </div>
         </section>
 

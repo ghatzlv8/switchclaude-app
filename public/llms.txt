@@ -1,0 +1,34 @@
+# SwitchClaude — llms.txt
+
+> SwitchClaude is a menubar app that switches between multiple Claude Desktop
+> accounts in ~2 seconds. One-time payment, no subscription.
+
+## What it is
+- Menubar (tray) switcher for Claude Desktop on macOS, Windows, and Linux.
+- Supports accounts with email login and Google login.
+- Each account lives in an isolated profile: chats, projects, and sessions never mix and are never deleted by switching.
+- Switching restarts Claude Desktop with the selected profile (~2 seconds).
+
+## Pricing (one-time, USD, no subscription)
+- Starter: $0 — 1 account, 7-day trial.
+- Pro: $9.99 one-time per extra account (e.g. 2 extra = $19.98).
+- Team: $29 one-time — up to 5 accounts.
+
+## Licensing
+- After Stripe Checkout, the buyer receives a key like `CLAUDE-SWITCHER-XXXX-XXXX`.
+- The key is pasted in the app under Settings → License and verified at `POST /api/validate`.
+- Keys are bound to devices (1 + number of extra accounts) and cached for 7 days of offline use.
+- Contact for license resets: info@lv8.gr.
+
+## Platform facts
+- Requires the official Claude Desktop app by Anthropic (separate download).
+- SwitchClaude is not affiliated with Anthropic.
+- Download: https://switchclaude.com/#download
+- Privacy: https://switchclaude.com/privacy
+
+## FAQ (short answers)
+- How fast is switching? About 2 seconds: quit Claude, relaunch with the other profile.
+- Are my chats safe? Yes — profiles are isolated directories; switching never deletes data.
+- Does it work with Google login? Yes — log in once per profile, it stays saved.
+- Which platforms? macOS 12+, Windows 10+, Ubuntu 20+ (and most Linux distros).
+- Is there a subscription? No. Pay once per extra account, lifetime updates.
