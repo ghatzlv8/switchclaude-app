@@ -1,0 +1,6 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /success
+
+Sitemap: https://switchclaude.com/sitemap.xml
