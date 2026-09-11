@@ -49,6 +49,7 @@ export default function Page(){
         <div id="c-detail" style={{display:"none", maxWidth:1080, margin:"12px auto 0", fontSize:13, background:"rgba(255,255,255,0.06)", borderRadius:6, padding:12}}>
           <label style={{display:"block", marginBottom:8}}><input type="checkbox" checked disabled /> Strictly necessary (consent record) — always on</label>
           <label style={{display:"block"}}><input type="checkbox" id="c-fonts" /> Enhanced fonts (loads from Google CDN — sends your IP to Google)</label>
+          <label style={{display:"block", marginTop:8}}><input type="checkbox" id="c-ga" /> Analytics (Google Analytics 4 — anonymous usage stats, only if accepted)</label>
           <div style={{marginTop:10}}><button id="c-save" style={{background:"#533afd", border:0, color:"#fff", padding:"8px 14px", borderRadius:4, cursor:"pointer", fontWeight:600}}>Save choice</button></div>
         </div>
       </div>
@@ -66,10 +67,11 @@ export default function Page(){
         function apply(c){ if(c && c.fonts) loadFonts(); }
         function show(){ var b=document.getElementById('consent'); if(b) b.style.display='block'; var f=document.getElementById('cookie-fab'); if(f) f.style.display='none'; }
         function hide(){ var b=document.getElementById('consent'); if(b) b.style.display='none'; var f=document.getElementById('cookie-fab'); if(f) f.style.display='block'; }
-        function save(fonts){
-          mem={necessary:true, fonts:!!fonts, ts:Date.now()};
+        function save(fonts, ga){
+          mem={necessary:true, fonts:!!fonts, ga:!!ga, ts:Date.now()};
           try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){}
           apply(mem); hide();
+          try{ window.dispatchEvent(new Event('sc-consent')); }catch(x){}
           var b=document.getElementById('c-accept'); if(b && fonts){ b.textContent='Saved ✓'; }
         }
         function wire(id, fn){ var el=document.getElementById(id); if(el) el.onclick=fn; }
@@ -77,13 +79,13 @@ export default function Page(){
         document.addEventListener('click', function(e){
           var t=e.target && e.target.closest ? e.target.closest('#c-accept,#c-reject,#c-custom,#c-save,#c-open,#cookie-fab') : null;
           if(!t) return;
-          if(t.id==='c-accept'){ save(true); }
-          else if(t.id==='c-reject'){ save(false); }
+          if(t.id==='c-accept'){ save(true, true); }
+          else if(t.id==='c-reject'){ save(false, false); }
           else if(t.id==='c-custom'){
             var d=document.getElementById('c-detail'); if(!d) return;
             d.style.display=(d.style.display==='none'||!d.style.display)?'block':'none';
           }
-          else if(t.id==='c-save'){ var c=document.getElementById('c-fonts'); save(c && c.checked); }
+          else if(t.id==='c-save'){ var f2=document.getElementById('c-fonts'); var g2=document.getElementById('c-ga'); save(f2 && f2.checked, g2 && g2.checked); }
           else if(t.id==='c-open'){ e.preventDefault(); try{localStorage.removeItem(KEY);}catch(x){} show(); }
           else if(t.id==='cookie-fab'){ try{localStorage.removeItem(KEY);}catch(x){} show(); }
         });
@@ -93,13 +95,13 @@ export default function Page(){
           setTimeout(function(){ if(!read()) show(); }, 800);
           setTimeout(function(){ if(!read()) show(); }, 2500);
         }
-        wire('c-accept', function(){ save(true); });
-        wire('c-reject', function(){ save(false); });
+        wire('c-accept', function(){ save(true, true); });
+        wire('c-reject', function(){ save(false, false); });
         wire('c-custom', function(){
           var d=document.getElementById('c-detail'); if(!d) return;
           d.style.display = (d.style.display==='none' || !d.style.display) ? 'block' : 'none';
         });
-        wire('c-save', function(){ var c=document.getElementById('c-fonts'); save(c && c.checked); });
+        wire('c-save', function(){ var f=document.getElementById('c-fonts'); var g=document.getElementById('c-ga'); save(f && f.checked, g && g.checked); });
         wire('c-open', function(e){ if(e) e.preventDefault(); try{localStorage.removeItem(KEY);}catch(x){} show(); });
         wire('cookie-fab', function(){ try{localStorage.removeItem(KEY);}catch(x){} show(); });
         window.scCookies=function(){ try{localStorage.removeItem(KEY);}catch(e){} show(); };

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SiteTags from "./tags";
 
 const SITE = "https://switchclaude.com";
 
@@ -40,7 +41,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-white text-zinc-900 antialiased">{children}</body>
+      <body className="bg-white text-zinc-900 antialiased">
+        <SiteTags />
+        {children}
+      </body>
     </html>
   );
 }

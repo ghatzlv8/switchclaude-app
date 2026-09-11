@@ -2,20 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>https://switchclaude.com</loc>
-<lastmod>2026-09-11T07:43:52.978Z</lastmod>
+<lastmod>2026-09-11T07:45:11.117Z</lastmod>
 <changefreq>weekly</changefreq>
 <priority>1</priority>
 </url>
 <url>
 <loc>https://switchclaude.com/privacy</loc>
-<lastmod>2026-09-11T07:43:52.978Z</lastmod>
+<lastmod>2026-09-11T07:45:11.117Z</lastmod>
 <changefreq>yearly</changefreq>
 <priority>0.4</priority>
-</url>
-<url>
-<loc>https://switchclaude.com/success</loc>
-<lastmod>2026-09-11T07:43:52.978Z</lastmod>
-<changefreq>yearly</changefreq>
-<priority>0.2</priority>
 </url>
 </urlset>

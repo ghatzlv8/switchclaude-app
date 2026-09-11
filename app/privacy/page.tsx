@@ -33,6 +33,7 @@ export default function Privacy() {
         <tbody>
           <tr><td style={S.td}><code>sc-consent</code> (localStorage)</td><td style={S.td}>Remembers your cookie choice</td><td style={S.td}>Legal obligation (GDPR consent record)</td><td style={S.td}>12 months</td></tr>
           <tr><td style={S.td}>Google Fonts (only if you accept)</td><td style={S.td}>Loads display fonts from Google&apos;s CDN (transfers your IP to Google)</td><td style={S.td}>Consent (Art. 6(1)(a))</td><td style={S.td}>Session</td></tr>
+          <tr><td style={S.td}>Google Analytics 4 (only if you accept)</td><td style={S.td}>Anonymous usage statistics (_ga cookie)</td><td style={S.td}>Consent (Art. 6(1)(a))</td><td style={S.td}>Up to 14 months</td></tr>
           <tr><td style={S.td}>Stripe checkout cookies</td><td style={S.td}>Set by stripe.com during payment only</td><td style={S.td}>Contract (Art. 6(1)(b))</td><td style={S.td}>Per Stripe&apos;s policy</td></tr>
         </tbody>
       </table>
