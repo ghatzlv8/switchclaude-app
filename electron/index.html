@@ -85,4 +85,60 @@ window.api.onState(refresh);
 window.api.onFocusLicense(() => document.getElementById('k').focus());
 refresh();
 </script>
+<hr>
+<h2 style="font-weight:300;margin:0 0 4px">Migration Assistant</h2>
+<div class="sub">Move your work to another account — backup, manifest, guided steps.</div>
+<label>Source account</label>
+<select id="mig-src" style="width:100%;padding:10px;border:1px solid #e5edf5;border-radius:4px;margin-top:8px"></select>
+<div id="mig-stats" class="note"></div>
+<button class="primary" onclick="migBackup()">1 · Backup profile</button>
+<div id="mig-bmsg" class="msg"></div>
+<button class="primary" onclick="migCsv()" style="background:#061b31">2 · Export session manifest (CSV)</button>
+<div class="note" style="margin-top:12px"><b>3 · Move Projects manually</b> (claude.ai): download each Project's docs + copy instructions, recreate in the target account.</div>
+<div class="note"><b>4 · Critical chats:</b> Share → link → open in target account → Continue.</div>
+<div class="note">Server chats can't move automatically — IDs are account-bound. This assistant makes sure nothing is forgotten.</div>
+<script>
+async function migFill(){
+  const s = await window.api.getState();
+  const sel = document.getElementById('mig-src');
+  sel.innerHTML = s.accounts.map(a=>`<option value="${a.id}">${a.label}</option>`).join('');
+  migStats();
+}
+async function migStats(){
+  const id = document.getElementById('mig-src').value;
+  if(!id) return;
+  const st = await window.api.migStats(id);
+  document.getElementById('mig-stats').innerHTML = st.length
+    ? st.map(x=>`${x.sessions} sessions (…${x.account}) — latest ${x.latest?new Date(x.latest).toISOString().slice(0,10):'?'}`).join('<br>')
+    : 'No local sessions found.';
+}
+document.getElementById('mig-src').addEventListener('change', migStats);
+let migTimer = null;
+async function migBackup(){
+  const id = document.getElementById('mig-src').value;
+  const m = document.getElementById('mig-bmsg');
+  m.className='msg'; m.textContent='Backing up… (large profiles take minutes)';
+  const r = await window.api.migBackup(id);
+  if(!r.ok){ m.className='msg err'; m.textContent=r.error||'Backup failed.'; return; }
+  clearInterval(migTimer);
+  migTimer = setInterval(async ()=>{
+    const s = await window.api.migBackupStatus(r.target);
+    if(s.status==='done'){ clearInterval(migTimer); m.className='msg ok'; m.textContent='Backup done: '+r.target; }
+    else if(s.status==='error'){ clearInterval(migTimer); m.className='msg err'; m.textContent='Backup failed.'; }
+  }, 3000);
+}
+async function migCsv(){
+  const id = document.getElementById('mig-src').value;
+  const rows = await window.api.migManifest(id);
+  const head = 'last_activity,model,cwd,session,status';
+  const esc = v=>'"'+String(v||'').replace(/"/g,'""')+'"';
+  const csv = head+'\n'+rows.map(r=>[r.last_activity,r.model,r.cwd,r.session,r.status].map(esc).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'sessions-'+id+'.csv'; a.click();
+  const m = document.getElementById('mig-bmsg');
+  m.className='msg ok'; m.textContent = rows.length+' sessions exported.';
+}
+migFill();
+</script>
 </body></html>

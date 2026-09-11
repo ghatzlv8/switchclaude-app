@@ -167,7 +167,7 @@ function buildTray() {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 420, height: 600, show: false, center: true,
+    width: 440, height: 720, show: false, center: true,
     webPreferences: { preload: path.join(__dirname, "preload.js") },
   });
   win.webContents.on("console-message", (_, level, message, line, source) => {
@@ -183,6 +183,86 @@ ipcMain.handle("license:status", () => licenseStatus());
 ipcMain.handle("accounts:list", () => state());
 ipcMain.handle("accounts:add", () => addAccount());
 ipcMain.handle("accounts:switch", (_, id) => { switchTo(id); return { ok: true }; });
+function profileStats(id) {
+  // Read-only scan: counts + latest activity per account-UUID dir.
+  const base = path.join(dataDir(id), "local-agent-mode-sessions");
+  const out = [];
+  let dirs = [];
+  try { dirs = fs.readdirSync(base); } catch { return out; }
+  for (const acct of dirs) {
+    let files = [];
+    try {
+      const subs = fs.readdirSync(path.join(base, acct));
+      for (const s of subs) {
+        try {
+          const m = fs.readdirSync(path.join(base, acct, s)).filter(f => f.startsWith("local_") && f.endsWith(".json"));
+          for (const f of m) files.push(path.join(base, acct, s, f));
+        } catch {}
+      }
+    } catch {}
+    let latest = 0, n = 0;
+    for (const f of files.slice(0, 5000)) {
+      try {
+        const d = JSON.parse(fs.readFileSync(f, "utf8"));
+        n++;
+        const la = d.lastActivityAt;
+        if (typeof la === "number" && la > latest) latest = la;
+      } catch {}
+    }
+    if (n) out.push({ account: acct.slice(0, 8), sessions: n, latest });
+  }
+  return out;
+}
+
+function manifestRows(id) {
+  const base = path.join(dataDir(id), "local-agent-mode-sessions");
+  const rows = [];
+  let dirs = [];
+  try { dirs = fs.readdirSync(base); } catch { return rows; }
+  for (const acct of dirs) {
+    let subs = [];
+    try { subs = fs.readdirSync(path.join(base, acct)); } catch { continue; }
+    for (const s of subs) {
+      let files = [];
+      try { files = fs.readdirSync(path.join(base, acct, s)).filter(f => f.startsWith("local_") && f.endsWith(".json")); } catch { continue; }
+      for (const f of files) {
+        try {
+          const d = JSON.parse(fs.readFileSync(path.join(base, acct, s, f), "utf8"));
+          rows.push({
+            last_activity: typeof d.lastActivityAt === "number" ? new Date(d.lastActivityAt).toISOString().slice(0, 16).replace("T", " ") : "",
+            model: d.model || "", cwd: d.cwd || "", session: d.sessionId || "",
+            status: d.isArchived ? "archived" : "", ts: d.lastActivityAt || 0,
+          });
+        } catch {}
+      }
+    }
+  }
+  rows.sort((a, b) => b.ts - a.ts);
+  return rows.map(({ ts, ...r }) => r);
+}
+
+ipcMain.handle("migrate:stats", (_, id) => profileStats(id));
+ipcMain.handle("migrate:manifest", (_, id) => manifestRows(id));
+ipcMain.handle("migrate:backup", (_, { id, dest }) => {
+  // Timestamped recursive copy. Runs async — renderer polls migrate:backup-status.
+  const src = dataDir(id);
+  const stamp = new Date().toISOString().slice(0, 10);
+  const target = path.join(dest, `claude-backup-${id}-${stamp}`);
+  try { fs.mkdirSync(target, { recursive: true }); } catch (e) { return { ok: false, error: String(e.message || e) }; }
+  const cp = spawn(process.platform === "win32" ? "xcopy" : "cp",
+    process.platform === "win32" ? [src, target + "\\", "/E", "/I", "/Y"] : ["-R", src + "/", target + "/"],
+    { stdio: "ignore" });
+  backupJobs[target] = cp;
+  cp.on("close", code => { backupJobs[target] = code === 0 ? "done" : "error"; });
+  return { ok: true, target };
+});
+const backupJobs = {};
+ipcMain.handle("migrate:backup-status", (_, target) => {
+  const j = backupJobs[target];
+  if (j === "done") return { status: "done" };
+  if (j === "error") return { status: "error" };
+  return { status: "running" };
+});
 ipcMain.handle("accounts:rename", (_, { id, label }) => {
   label = (label || "").trim().slice(0, 60);
   if (!label) return { ok: false };
