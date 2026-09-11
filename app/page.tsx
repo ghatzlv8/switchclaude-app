@@ -235,7 +235,8 @@ export default function Page(){
               4. If valid, the app unlocks + Add Account. The key is saved locally and cached for 7 days for offline use.
             </div>
           </div>
-          <div style={{marginTop:8, fontSize:11, color:"#64748d"}}>macOS 12+ • Windows 10+ • Ubuntu 20+ • No Apple Developer needed.</div>
+          <div style={{marginTop:8, fontSize:11, color:"#64748d"}}>macOS 12+ (Apple Silicon & Intel) • Windows 10+ • Ubuntu 20+ • No Apple Developer needed.</div>
+          <div style={{marginTop:8, fontSize:12, color:"#273951", background:"#fff", border:"1px solid #e5edf5", borderRadius:6, padding:"10px 14px"}}>First launch on Mac: <b>right-click the app → Open → Open</b> (we&apos;re indie — no $99 Apple certificate yet). If macOS says &quot;damaged&quot;, run: <code style={{fontFamily:"Source Code Pro", fontSize:11, background:"#f6f9fc", padding:"2px 6px", borderRadius:4}}>xattr -cr /Applications/SwitchClaude.app</code> then reopen.</div>
         </section>
 
         <footer style={{maxWidth:1080, margin:"0 auto", padding:"24px", borderTop:"1px solid #e5edf5", fontSize:11, color:"#64748d"}}>© 2026 SwitchClaude — Not affiliated with Anthropic. • info@lv8.gr • <a href="/privacy" style={{color:"#64748d"}}>Privacy</a> • <a href="#" id="c-open" style={{color:"#64748d"}}>Cookie settings</a></footer>
