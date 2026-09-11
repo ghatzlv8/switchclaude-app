@@ -183,6 +183,14 @@ ipcMain.handle("license:status", () => licenseStatus());
 ipcMain.handle("accounts:list", () => state());
 ipcMain.handle("accounts:add", () => addAccount());
 ipcMain.handle("accounts:switch", (_, id) => { switchTo(id); return { ok: true }; });
+ipcMain.handle("accounts:launch", (_, id) => {
+  // Run alongside: launch without killing the current instance.
+  launchProfile(id);
+  const s = loadProfiles(); s.active = id; saveProfiles(s);
+  buildTray();
+  pushState();
+  return { ok: true };
+});
 function profileStats(id) {
   // Read-only scan: counts + latest activity per account-UUID dir.
   const base = path.join(dataDir(id), "local-agent-mode-sessions");

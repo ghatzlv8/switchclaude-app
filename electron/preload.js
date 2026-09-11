@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld("api", {
   getState: () => ipcRenderer.invoke("accounts:list"),
   addAccount: () => ipcRenderer.invoke("accounts:add"),
   switchTo: (id) => ipcRenderer.invoke("accounts:switch", id),
+  launchAlone: (id) => ipcRenderer.invoke("accounts:launch", id),
   rename: (id, label) => ipcRenderer.invoke("accounts:rename", { id, label }),
   migStats: (id) => ipcRenderer.invoke("migrate:stats", id),
   migManifest: (id) => ipcRenderer.invoke("migrate:manifest", id),

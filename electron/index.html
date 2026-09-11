@@ -39,7 +39,7 @@ async function refresh(){
   plan.textContent = s.plan === 'pro' ? `Pro — ${s.max} accounts` : 'Free — 1 account';
   document.getElementById('list').innerHTML = s.accounts.map(a =>
     `<div class="acc ${a.id===s.active?'active':'idle'}"><span id="lbl-${a.id}">${a.id===s.active?'● ':''}${a.label} <a href="#" onclick="rn('${a.id}','${a.label.replace(/'/g,"\\'")}');return false" style="font-size:11px;opacity:.6;color:inherit">✎</a></span>` +
-    (a.id===s.active ? `<span style="font-size:11px;opacity:.7">Active</span>` : `<button onclick="sw('${a.id}')">Switch →</button>`) + `</div>`
+    (a.id===s.active ? `<span style="font-size:11px;opacity:.7">Active</span>` : `<span><button onclick="sw('${a.id}')">Switch →</button> <button onclick="run('${a.id}')" title="Run alongside the current account" style="background:#061b31">Run ▶</button></span>`) + `</div>`
   ).join('') || '<div class="note">No accounts yet — add your first below.</div>';
   const full = s.accounts.length >= s.max;
   document.getElementById('add').disabled = full;
@@ -53,6 +53,11 @@ async function add(){
   refresh();
 }
 async function sw(id){ await window.api.switchTo(id); refresh(); }
+async function run(id){
+  await window.api.launchAlone(id);
+  msg('Second Claude launched alongside — both running.', true);
+  refresh();
+}
 async function rn(id, cur){
   try {
     if(!window.api || !window.api.rename){ msg('Bridge error: restart the app.', false); return; }
