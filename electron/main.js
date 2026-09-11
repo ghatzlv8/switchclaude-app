@@ -17,7 +17,7 @@ function deviceId() {
 }
 
 const API = "https://switchclaude.com/api/validate";
-const STORE = path.join(os.homedir(), "claude-switcher");
+const STORE = process.env.SWITCHCLAUDE_STORE || path.join(os.homedir(), "claude-switcher");
 const PROFILES = path.join(STORE, "profiles.json");
 const LICENSE_FILE = path.join(STORE, "license.json");
 const OFFLINE_DAYS = 7;
