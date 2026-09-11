@@ -46,11 +46,42 @@ def typewriter(full, n, start, cps=24):
     k = int((n - start) * cps / FPS)
     return full[:max(0, k)] if n >= start else ""
 
+_BG_CACHE = None
+
+def background():
+    """Vertical gradient + faint grid dots + ambient glows (precomputed once)."""
+    global _BG_CACHE
+    if _BG_CACHE is None:
+        im = Image.new("RGB", (W, H))
+        top = (16, 14, 34)
+        bot = (8, 8, 18)
+        px = im.load()
+        for y in range(H):
+            t = y / H
+            c = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
+            for x in range(W):
+                px[x, y] = c
+        d = ImageDraw.Draw(im, "RGBA")
+        for gx in range(80, W, 120):
+            for gy in range(60, H, 120):
+                d.ellipse([gx-1, gy-1, gx+1, gy+1], fill=(255, 255, 255, 10))
+        glow1 = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(glow1)
+        gd.ellipse([-350, -450, 550, 150], fill=(83, 58, 253, 26))
+        gd.ellipse([730, 620, 1630, 1170], fill=(21, 190, 83, 18))
+        _BG_CACHE = Image.alpha_composite(im.convert("RGBA"), glow1).convert("RGB")
+    return _BG_CACHE.copy()
+
+def progress_bar(d, frac, alpha=255):
+    w = int(W * max(0.0, min(1.0, frac)))
+    d.rounded_rectangle([60, H-26, 60+w, H-20], radius=3, fill=PURPLE+(int(alpha),))
+    d.rounded_rectangle([60, H-26, W-60, H-20], radius=3, outline=(255, 255, 255, 30), width=1)
+
 # ---------------- scenes (each returns list of frames = base Image) ----------------
 def scene1(frames):
     F1, F2, F3 = font(64, True), font(34), font(30)
     for n in range(frames):
-        im = Image.new("RGB", (W, H), BG)
+        im = background()
         d = ImageDraw.Draw(im, "RGBA")
         a = fade_in(n, 0, 15)
         draw_text_center(d, W/2, 150, typewriter("2 Claude accounts. 1 app.", n, 0), F1, WHITE, 255*a)
@@ -62,6 +93,7 @@ def scene1(frames):
             draw_text_center(d, W/2 + xoff, 300 + i*60, s, F2, RED, 255*a2)
         a3 = fade_in(n, 80, 15)
         draw_text_center(d, W/2, 520, "Sound familiar?", F3, DIM, 255*a3)
+        progress_bar(d, n / frames)
         yield im
 
 def mock_window(d, cx, cy, alpha=255, highlight=False):
@@ -84,7 +116,7 @@ def mock_window(d, cx, cy, alpha=255, highlight=False):
 def scene2(frames):
     F1, F2 = font(30, True), font(40, True)
     for n in range(frames):
-        im = Image.new("RGB", (W, H), BG)
+        im = background()
         d = ImageDraw.Draw(im, "RGBA")
         a = fade_in(n, 0, 12)
         rrect(d, [W/2-110, 40, W/2+110, 92], 14, PANEL, 255*a)
@@ -105,13 +137,14 @@ def scene2(frames):
                 d.ellipse([bx-26, by-26, bx+26, by+26], outline=GREEN+(int(200*a3),), width=4)
         a4 = fade_in(n, 105, 15)
         draw_text_center(d, W/2, 600, "…2 seconds…", F2, GREEN, 255*a4)
+        progress_bar(d, n / frames)
         yield im
 
 def scene3(frames):
     F1, F2 = font(32), font(30, True)
     steps = ["+  Add Account", "Log in once", "Saved forever — isolated profile"]
     for n in range(frames):
-        im = Image.new("RGB", (W, H), BG)
+        im = background()
         d = ImageDraw.Draw(im, "RGBA")
         for i, s in enumerate(steps):
             st = 8 + i*22
@@ -123,12 +156,13 @@ def scene3(frames):
             d.text((370+xoff, y), s, font=F1, fill=WHITE+(int(255*a),))
         a2 = fade_in(n, 85, 15)
         draw_text_center(d, W/2, 500, "Chats can never mix — or get lost.", F2, GREEN, 255*a2)
+        progress_bar(d, n / frames)
         yield im
 
 def scene4(frames):
     F1, F2, F3 = font(30), font(38, True), font(26)
     for n in range(frames):
-        im = Image.new("RGB", (W, H), BG)
+        im = background()
         d = ImageDraw.Draw(im, "RGBA")
         a = fade_in(n, 0, 15)
         key = "CLAUDE-SWITCHER-XXXX-XXXX"
@@ -142,12 +176,13 @@ def scene4(frames):
         draw_text_center(d, W/2, 420, "Mac  •  Windows  •  Linux", F3, WHITE, 255*a3)
         a4 = fade_in(n, 72, 15)
         draw_text_center(d, W/2, 470, "offline ✓     yours forever ✓", F3, DIM, 255*a4)
+        progress_bar(d, n / frames)
         yield im
 
 def scene5(frames):
     F1, F2, F3 = font(34), font(64, True), font(38, True)
     for n in range(frames):
-        im = Image.new("RGB", (W, H), BG)
+        im = background()
         d = ImageDraw.Draw(im, "RGBA")
         a = fade_in(n, 0, 15)
         draw_text_center(d, W/2, 170, "Stop logging in and out.", F1, DIM, 255*a)
@@ -160,6 +195,7 @@ def scene5(frames):
         if a3 > 0:
             d.rounded_rectangle([W/2-kw/2-28, 400, W/2+kw/2+28, 472], radius=14, outline=PURPLE+(int(255*a3),), width=3)
         draw_text_center(d, W/2, 415, url, F3, PURPLE, 255*a3)
+        progress_bar(d, n / frames)
         yield im
 
 SCENES = [("s1", scene1), ("s2", scene2), ("s3", scene3), ("s4", scene4), ("s5", scene5)]

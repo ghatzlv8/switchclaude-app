@@ -131,6 +131,11 @@ export default function Page(){
         {/* HOW */}
         <section id="how" style={{maxWidth:1080, margin:"0 auto", padding:"40px 24px", borderTop:"1px solid #e5edf5"}}>
           <h2 className="sec-h2">How it works</h2>
+          <div style={{marginTop:16, borderRadius:8, overflow:"hidden", border:"1px solid #e5edf5", boxShadow:"rgba(50,50,93,0.25) 0px 30px 45px -30px, rgba(0,0,0,0.1) 0px 18px 36px -18px"}}>
+            <video controls preload="metadata" poster="/explainer-poster.png" style={{width:"100%", display:"block", aspectRatio:"16/9", background:"#0A0A14"}}>
+              <source src="/explainer.mp4" type="video/mp4" />
+            </video>
+          </div>
           <div className="cards-grid">
             {[
               ["01 — Add account","Click + → Claude opens empty → you log in once (Email or Google). We save an isolated profile — chats never lost."],
