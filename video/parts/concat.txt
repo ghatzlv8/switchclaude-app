@@ -1,0 +1,5 @@
+file '/Users/ghatz/switchclaude/video/parts/s1a.mp4'
+file '/Users/ghatz/switchclaude/video/parts/s2a.mp4'
+file '/Users/ghatz/switchclaude/video/parts/s3a.mp4'
+file '/Users/ghatz/switchclaude/video/parts/s4a.mp4'
+file '/Users/ghatz/switchclaude/video/parts/s5a.mp4'
