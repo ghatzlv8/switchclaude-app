@@ -157,12 +157,17 @@ function buildTray() {
   items.push({ label: "Open SwitchClaude", click: () => win && win.show() });
   items.push({ label: "Enter license…", click: () => { win && win.show(); win && win.webContents.send("focus-license"); } });
   items.push({ label: "Quit", click: () => app.quit() });
-  if (!tray) {
-    tray = new Tray(nativeImage.createEmpty());
-    tray.setTitle("Claude ⇄");
-    tray.setToolTip("SwitchClaude");
+  // Linux (e.g. GNOME) often has no system tray — never let that crash the app.
+  try {
+    if (!tray) {
+      tray = new Tray(nativeImage.createEmpty());
+      tray.setTitle("Claude ⇄");
+      tray.setToolTip("SwitchClaude");
+    }
+    tray.setContextMenu(Menu.buildFromTemplate(items));
+  } catch (e) {
+    tray = null; // window-only mode; window shows on launch below
   }
-  tray.setContextMenu(Menu.buildFromTemplate(items));
 }
 
 function createWindow() {
@@ -288,9 +293,10 @@ app.whenReady().then(() => {
   fs.mkdirSync(path.join(STORE, "profiles"), { recursive: true });
   createWindow();
   buildTray();
-  // Show window on manual launch; stay in tray when auto-started at login.
+  // Show window on manual launch, when there is no tray (Linux window-only mode),
+  // or when no accounts exist yet.
   const s = loadProfiles();
-  if (!app.getLoginItemSettings().wasOpenedAtLogin || s.accounts.length === 0) {
+  if (!tray || !app.getLoginItemSettings().wasOpenedAtLogin || s.accounts.length === 0) {
     win.center();
     win.show();
     win.focus();

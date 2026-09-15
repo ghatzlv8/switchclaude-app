@@ -20,6 +20,7 @@ label{font-size:13px;font-weight:600}
 hr{border:0;border-top:1px solid #e5edf5;margin:20px 0}
 </style></head><body>
 <h1>SwitchClaude</h1>
+<div id="fatal" style="display:none;background:#fdecec;border:1px solid #e5484d;border-radius:6px;padding:12px;font-size:13px;margin-bottom:12px">Something went wrong: <span></span><br>Please email this text to info@lv8.gr and we'll fix it.</div>
 <div class="sub">Switch Claude accounts in 2 seconds.</div>
 <div id="plan" class="plan free">Free</div>
 <div id="list"></div>
@@ -32,6 +33,14 @@ hr{border:0;border-top:1px solid #e5edf5;margin:20px 0}
 <div id="msg" class="msg"></div>
 <div class="note">1 account free. Extra accounts $9.99 one-time at switchclaude.com.<br>Key is saved on this Mac and works offline for 7 days.</div>
 <script>
+window.addEventListener('error', function(e){
+  var b = document.getElementById('fatal');
+  if(b){ b.style.display='block'; b.querySelector('span').textContent = String(e.message||'Unknown error'); }
+});
+window.addEventListener('unhandledrejection', function(e){
+  var b = document.getElementById('fatal');
+  if(b){ b.style.display='block'; b.querySelector('span').textContent = String((e.reason && e.reason.message) || e.reason || 'Unknown error'); }
+});
 async function refresh(){
   const s = await window.api.getState();
   const plan = document.getElementById('plan');

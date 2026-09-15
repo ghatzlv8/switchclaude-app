@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const REPO = "https://github.com/ghatzlv8/switchclaude-app";
-const TAG = "v1.0.0";
+const TAG = "v1.0.1";
 const FILES: Record<string, string> = {
-  mac: "SwitchClaude-1.0.0-universal.dmg",
-  win: "SwitchClaude.Setup.1.0.0.exe",
-  linux: "SwitchClaude-1.0.0.AppImage",
+  mac: "SwitchClaude-1.0.1-universal.dmg",
+  win: "SwitchClaude.Setup.1.0.1.exe",
+  linux: "SwitchClaude-1.0.1.AppImage",
 };
 
 // Redirect to the real binary. If the asset isn't published yet (CI still
