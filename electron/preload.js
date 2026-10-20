@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld("api", {
   rename: (id, label) => ipcRenderer.invoke("accounts:rename", { id, label }),
   migStats: (id) => ipcRenderer.invoke("migrate:stats", id),
   migManifest: (id) => ipcRenderer.invoke("migrate:manifest", id),
-  migBackup: (id) => ipcRenderer.invoke("migrate:backup", { id, dest: require("os").homedir() + "/claude-switcher/backups" }),
+  migBackup: (id) => ipcRenderer.invoke("migrate:backup", { id }),
   migBackupStatus: (t) => ipcRenderer.invoke("migrate:backup-status", t),
   onState: (fn) => ipcRenderer.on("state", (_, s) => fn(s)),
   onFocusLicense: (fn) => ipcRenderer.on("focus-license", fn),

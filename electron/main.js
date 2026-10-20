@@ -260,7 +260,7 @@ ipcMain.handle("migrate:backup", (_, { id, dest }) => {
   // Timestamped recursive copy. Runs async — renderer polls migrate:backup-status.
   const src = dataDir(id);
   const stamp = new Date().toISOString().slice(0, 10);
-  const target = path.join(dest, `claude-backup-${id}-${stamp}`);
+  const target = path.join(dest || path.join(os.homedir(), "claude-switcher", "backups"), `claude-backup-${id}-${stamp}`);
   try { fs.mkdirSync(target, { recursive: true }); } catch (e) { return { ok: false, error: String(e.message || e) }; }
   const cp = spawn(process.platform === "win32" ? "xcopy" : "cp",
     process.platform === "win32" ? [src, target + "\\", "/E", "/I", "/Y"] : ["-R", src + "/", target + "/"],
@@ -290,6 +290,8 @@ ipcMain.handle("accounts:rename", (_, { id, label }) => {
 });
 
 app.whenReady().then(() => {
+  // Menu-bar-only on macOS: no Dock icon, no Cmd+Tab entry — the tray is the home.
+  if (process.platform === "darwin") app.dock.hide();
   fs.mkdirSync(path.join(STORE, "profiles"), { recursive: true });
   createWindow();
   buildTray();
